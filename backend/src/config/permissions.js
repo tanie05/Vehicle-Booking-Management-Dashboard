@@ -8,6 +8,9 @@ const permissions = {
   "/api/bookings": {
     GET: ["admin", "manager", "driver", "customer"],
   },
+  "/api/bookings/cities": {
+    GET: ["admin", "manager"],
+  },
   "/api/bookings/:id/assign": {
     PATCH: ["admin", "manager"],
   },
