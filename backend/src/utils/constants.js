@@ -10,7 +10,6 @@ const BookingStatus = Object.freeze({
   Assigned: "assigned",
   Completed: "completed",
   Cancelled: "cancelled",
-  Due: "due",
 });
 
 module.exports = { Role, BookingStatus };

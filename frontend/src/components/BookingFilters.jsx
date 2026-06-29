@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getCities } from "../api/bookings";
+import styles from "./BookingFilters.module.css";
 
 export default function BookingFilters({ filters, setFilters, user }) {
   const [cities, setCities] = useState([]);
@@ -18,33 +19,24 @@ export default function BookingFilters({ filters, setFilters, user }) {
     setFilters({ status: "", city: "", today: false, yesterday: false, search: "" });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 8,
-        marginBottom: 12,
-        flexWrap: "wrap",
-        alignItems: "center",
-      }}
-    >
+    <div className={styles.container}>
       <select
         value={filters.status}
         onChange={(e) => handleChange("status", e.target.value)}
-        style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid #cbd5e1" }}
+        className={styles.select}
       >
         <option value="">All status</option>
         <option value="pending">Pending</option>
         <option value="assigned">Assigned</option>
         <option value="completed">Completed</option>
         <option value="cancelled">Cancelled</option>
-        <option value="due">Due</option>
       </select>
 
       {user?.role === "admin" && (
         <select
           value={filters.city}
           onChange={(e) => handleChange("city", e.target.value)}
-          style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid #cbd5e1" }}
+          className={styles.select}
         >
           <option value="">All cities</option>
           {cities.map((c) => (
@@ -53,7 +45,7 @@ export default function BookingFilters({ filters, setFilters, user }) {
         </select>
       )}
 
-      <label style={{ fontSize: 14, display: "flex", alignItems: "center", gap: 4 }}>
+      <label className={styles.checkboxLabel}>
         <input
           type="checkbox"
           checked={filters.today}
@@ -64,7 +56,7 @@ export default function BookingFilters({ filters, setFilters, user }) {
         Today
       </label>
 
-      <label style={{ fontSize: 14, display: "flex", alignItems: "center", gap: 4 }}>
+      <label className={styles.checkboxLabel}>
         <input
           type="checkbox"
           checked={filters.yesterday}
@@ -80,27 +72,10 @@ export default function BookingFilters({ filters, setFilters, user }) {
         placeholder="Search..."
         value={filters.search || ""}
         onChange={(e) => handleChange("search", e.target.value)}
-        style={{
-          padding: "4px 8px",
-          borderRadius: 4,
-          border: "1px solid #cbd5e1",
-          fontSize: 14,
-          flex: 1,
-          minWidth: 160,
-        }}
+        className={styles.searchInput}
       />
 
-      <button
-        onClick={clear}
-        style={{
-          padding: "4px 12px",
-          borderRadius: 4,
-          border: "1px solid #cbd5e1",
-          background: "#fff",
-          cursor: "pointer",
-          fontSize: 13,
-        }}
-      >
+      <button onClick={clear} className={styles.clearBtn}>
         Clear
       </button>
     </div>

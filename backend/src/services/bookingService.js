@@ -37,19 +37,7 @@ const getBookings = async (filters, user) => {
     query.driverId = user.id;
   }
 
-  const bookings = await bookingRepo.findBookings(query);
-  const now = new Date();
-
-  return bookings.map((b) => {
-    const booking = b.toObject();
-    if (
-      (booking.status === BookingStatus.Pending || booking.status === BookingStatus.Assigned) &&
-      new Date(booking.journeyEnd) < now
-    ) {
-      booking.status = BookingStatus.Due;
-    }
-    return booking;
-  });
+  return bookingRepo.findBookings(query);
 };
 
 const completeBooking = async (bookingId, userId) => {
@@ -67,31 +55,9 @@ const completeBooking = async (bookingId, userId) => {
   return updated;
 };
 
-const autoCompleteExpiredBookings = async () => {
-  const now = new Date();
-  const bookings = await bookingRepo.findBookings({
-    status: BookingStatus.Assigned,
-  });
-
-  let completed = 0;
-  for (const b of bookings) {
-    if (b.status !== BookingStatus.Assigned) continue;
-    if (new Date(b.journeyEnd) >= now) continue;
-
-    await bookingRepo.updateBooking(b._id, { status: BookingStatus.Completed });
-    const populated = await bookingRepo.findById(b._id);
-    notificationService.emitBookingEvent("booking-completed", populated);
-    completed++;
-  }
-
-  if (completed > 0) {
-    console.log(`[Auto] ${completed} expired booking(s) auto-completed.`);
-  }
-};
-
 const getCities = async (user) => {
   if (user.role === "manager") return [user.city];
   return bookingRepo.distinctCities();
 };
 
-module.exports = { createBooking, getBookings, completeBooking, autoCompleteExpiredBookings, getCities };
+module.exports = { createBooking, getBookings, completeBooking, getCities };

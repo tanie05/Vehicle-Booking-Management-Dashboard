@@ -1,0 +1,59 @@
+.container {
+  max-width: 400px;
+  margin: 40px auto;
+}
+
+.heading {
+  margin: 0 0 20px;
+}
+
+.error {
+  color: #ef4444;
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.submitBtn {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.footer {
+  font-size: 14px;
+  margin-top: 16px;
+  text-align: center;
+}

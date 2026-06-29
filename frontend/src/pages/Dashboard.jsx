@@ -4,6 +4,7 @@ import useBookings from "../hooks/useBookings";
 import BookingFilters from "../components/BookingFilters";
 import BookingTable from "../components/BookingTable";
 import SummaryCards from "../components/SummaryCards";
+import styles from "./Dashboard.module.css";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -14,15 +15,12 @@ export default function Dashboard() {
 
   if (!["admin", "manager"].includes(user?.role)) {
     return (
-      <div style={{ maxWidth: 480, margin: "80px auto", textAlign: "center" }}>
-        <h2 style={{ color: "#dc2626" }}>Access Denied</h2>
-        <p style={{ color: "#64748b", fontSize: 15 }}>
+      <div className={styles.denied}>
+        <h2 className={styles.deniedHeading}>Access Denied</h2>
+        <p className={styles.deniedText}>
           Only admins and managers can access the dashboard.
         </p>
-        <button onClick={logout} style={{
-          marginTop: 12, padding: "8px 20px", borderRadius: 6,
-          border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer",
-        }}>
+        <button onClick={logout} className={styles.deniedBtn}>
           Logout
         </button>
       </div>
@@ -31,19 +29,14 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16,
-      }}>
-        <h2 style={{ margin: 0 }}>Dashboard</h2>
-        <div style={{ fontSize: 14 }}>
+      <div className={styles.header}>
+        <h2 className={styles.headerTitle}>Dashboard</h2>
+        <div className={styles.userInfo}>
           <span>
             {user?.name} ({user?.role})
             {user?.city && ` \u2014 ${user.city}`}
           </span>
-          <button onClick={logout} style={{
-            marginLeft: 12, padding: "4px 12px", borderRadius: 4,
-            border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", fontSize: 13,
-          }}>
+          <button onClick={logout} className={styles.logoutBtn}>
             Logout
           </button>
         </div>
@@ -52,7 +45,7 @@ export default function Dashboard() {
       <BookingFilters filters={filters} setFilters={setFilters} user={user} />
 
       {loading ? (
-        <p style={{ color: "#94a3b8" }}>Loading bookings...</p>
+        <p className={styles.loading}>Loading bookings...</p>
       ) : (
         <>
           <SummaryCards bookings={bookings} />

@@ -1,24 +1,6 @@
 import { useState, useEffect } from "react";
 import { getDrivers } from "../api/drivers";
-
-const backdropStyle = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0,0,0,0.4)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const modalStyle = {
-  background: "#fff",
-  borderRadius: 12,
-  padding: 24,
-  minWidth: 360,
-  maxWidth: 480,
-  boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-};
+import styles from "./AssignDriverModal.module.css";
 
 export default function AssignDriverModal({ booking, user, onAssign, onClose }) {
   const [drivers, setDrivers] = useState([]);
@@ -53,36 +35,27 @@ export default function AssignDriverModal({ booking, user, onAssign, onClose }) 
   };
 
   return (
-    <div style={backdropStyle} onClick={onClose}>
-      <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
-        <h3 style={{ margin: "0 0 16px" }}>Assign Driver</h3>
-        <p style={{ fontSize: 14, color: "#64748b", marginBottom: 16 }}>
-          Booking: {booking.customerName} &mdash; {booking.city}
+    <div className={styles.backdrop} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <h3 className={styles.heading}>Assign Driver</h3>
+        <p className={styles.info}>
+          {booking.customerName} &mdash; {booking.city}
           <br />
           {new Date(booking.journeyStart).toLocaleString()} &rarr;{" "}
           {new Date(booking.journeyEnd).toLocaleString()}
         </p>
 
-        {error && (
-          <p style={{ color: "#ef4444", fontSize: 14, marginBottom: 12 }}>{error}</p>
-        )}
+        {error && <p className={styles.error}>{error}</p>}
 
         {loading ? (
           <p>Loading drivers...</p>
         ) : drivers.length === 0 ? (
-          <p style={{ color: "#ef4444" }}>No available drivers found.</p>
+          <p className={styles.error}>No available drivers found.</p>
         ) : (
           <select
             value={selectedDriver}
             onChange={(e) => setSelectedDriver(e.target.value)}
-            style={{
-              width: "100%",
-              padding: 8,
-              marginBottom: 16,
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
-              fontSize: 14,
-            }}
+            className={styles.select}
           >
             <option value="">Select a driver</option>
             {drivers.map((d) => (
@@ -93,17 +66,8 @@ export default function AssignDriverModal({ booking, user, onAssign, onClose }) 
           </select>
         )}
 
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            onClick={onClose}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
-              background: "#fff",
-              cursor: "pointer",
-            }}
-          >
+        <div className={styles.footer}>
+          <button className={styles.btnCancel} onClick={onClose}>
             Cancel
           </button>
           <button

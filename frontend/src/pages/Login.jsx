@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
+import styles from "./Login.module.css";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -22,34 +23,28 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: 360, margin: "60px auto" }}>
-      <h2 style={{ margin: "0 0 20px" }}>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className={styles.container}>
+      <h2 className={styles.heading}>Login</h2>
+      {error && <p className={styles.error}>{error}</p>}
+      <form onSubmit={handleSubmit} className={styles.form}>
         <input
           placeholder="Email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
-          style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 14 }}
+          className={styles.input}
         />
         <input
           type="password"
           placeholder="Password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
-          style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 14 }}
+          className={styles.input}
         />
-        <button
-          type="submit"
-          style={{
-            padding: "10px", borderRadius: 6, border: "none",
-            background: "#3b82f6", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer",
-          }}
-        >
+        <button type="submit" className={styles.submitBtn}>
           Login
         </button>
       </form>
-      <p style={{ fontSize: 14, marginTop: 16 }}>
+      <p className={styles.footer}>
         Don't have an account? <Link to="/signup">Sign up</Link>
       </p>
     </div>

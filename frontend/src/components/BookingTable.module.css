@@ -1,0 +1,80 @@
+.wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cell {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+}
+
+.th {
+  composes: cell;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748b;
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.dateCell {
+  composes: cell;
+  font-size: 12px;
+}
+
+.emptyCell {
+  composes: cell;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btnUnassign {
+  composes: btn;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.btnComplete {
+  composes: btn;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.btnCancel {
+  composes: btn;
+  border-color: #ef4444;
+  color: #991b1b;
+}

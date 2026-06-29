@@ -1,0 +1,41 @@
+.container {
+  max-width: 360px;
+  margin: 60px auto;
+}
+
+.heading {
+  margin: 0 0 20px;
+}
+
+.error {
+  color: red;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+.submitBtn {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer {
+  font-size: 14px;
+  margin-top: 16px;
+}

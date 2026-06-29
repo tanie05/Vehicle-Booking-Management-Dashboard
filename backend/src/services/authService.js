@@ -55,44 +55,4 @@ const login = async ({ email, password }) => {
   };
 };
 
-const createDriver = async ({ name, email, password, phone, city, vehicleNumber }) => {
-  validateEmail(email);
-  validateStrongPassword(password);
-
-  const existing = await userRepo.findByEmail(email);
-  if (existing) throw new ConflictError("Email already registered.");
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = await userRepo.createUser({
-    name,
-    email,
-    passwordHash,
-    phone,
-    role: "driver",
-    city,
-    vehicleNumber,
-  });
-
-  return { id: user._id, name: user.name, email: user.email, role: user.role, city: user.city };
-};
-
-const createManager = async ({ name, email, password, city }) => {
-  validateEmail(email);
-  validateStrongPassword(password);
-
-  const existing = await userRepo.findByEmail(email);
-  if (existing) throw new ConflictError("Email already registered.");
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = await userRepo.createUser({
-    name,
-    email,
-    passwordHash,
-    role: "manager",
-    city,
-  });
-
-  return { id: user._id, name: user.name, email: user.email, role: user.role, city: user.city };
-};
-
-module.exports = { signup, login, createDriver, createManager };
+module.exports = { signup, login };

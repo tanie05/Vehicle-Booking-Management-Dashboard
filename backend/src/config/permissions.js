@@ -2,12 +2,6 @@ const permissions = {
   "/api/users/:id/role": {
     PATCH: ["admin"],
   },
-  "/api/auth/drivers": {
-    POST: ["admin"],
-  },
-  "/api/auth/managers": {
-    POST: ["admin"],
-  },
   "/api/drivers": {
     GET: ["admin", "manager"],
   },
