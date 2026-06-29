@@ -5,17 +5,12 @@ const Role = Object.freeze({
   Customer: "customer"
 });
 
-const DriverStatus = Object.freeze({
-  Available: "available",
-  Busy: "busy",
-  Offline: "offline",
-});
-
 const BookingStatus = Object.freeze({
   Pending: "pending",
   Assigned: "assigned",
   Completed: "completed",
   Cancelled: "cancelled",
+  Due: "due",
 });
 
-module.exports = { Role, DriverStatus, BookingStatus };
+module.exports = { Role, BookingStatus };

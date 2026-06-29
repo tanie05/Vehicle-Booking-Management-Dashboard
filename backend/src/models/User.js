@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Role, DriverStatus } = require("../utils/constants");
+const { Role } = require("../utils/constants");
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    phone: {
+      type: String,
+      trim: true,
+    },
     role: {
       type: String,
       enum: Object.values(Role),
@@ -26,20 +30,12 @@ const userSchema = new mongoose.Schema(
     },
     city: {
       type: String,
+      required: true,
       trim: true,
     },
-    driverStatus: {
+    vehicleNumber: {
       type: String,
-      enum: Object.values(DriverStatus),
-      default: DriverStatus.Offline,
-    },
-    vehicleRef: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Vehicle",
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
+      trim: true,
     },
   },
   { timestamps: true }

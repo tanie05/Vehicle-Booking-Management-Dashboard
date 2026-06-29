@@ -3,8 +3,12 @@ const jwt = require("jsonwebtoken");
 const config = require("../config");
 const userRepo = require("../repositories/userRepository");
 const { ConflictError, UnauthorizedError, ValidationError } = require("../utils/errors");
+const { validateEmail, validateStrongPassword } = require("../utils/validators");
 
-const signup = async ({ name, email, password, role }) => {
+const signup = async ({ name, email, password, phone, city, role }) => {
+  validateEmail(email);
+  validateStrongPassword(password);
+
   const existing = await userRepo.findByEmail(email);
   if (existing) throw new ConflictError("Email already registered.");
 
@@ -13,7 +17,9 @@ const signup = async ({ name, email, password, role }) => {
     name,
     email,
     passwordHash,
+    phone,
     role: role || "customer",
+    ...(city && { city }),
   });
 
   const token = jwt.sign(
@@ -29,6 +35,8 @@ const signup = async ({ name, email, password, role }) => {
 };
 
 const login = async ({ email, password }) => {
+  validateEmail(email);
+
   const user = await userRepo.findByEmail(email);
   if (!user) throw new UnauthorizedError("Invalid email or password.");
 
@@ -47,7 +55,10 @@ const login = async ({ email, password }) => {
   };
 };
 
-const createDriver = async ({ name, email, password, city }) => {
+const createDriver = async ({ name, email, password, phone, city, vehicleNumber }) => {
+  validateEmail(email);
+  validateStrongPassword(password);
+
   const existing = await userRepo.findByEmail(email);
   if (existing) throw new ConflictError("Email already registered.");
 
@@ -56,15 +67,19 @@ const createDriver = async ({ name, email, password, city }) => {
     name,
     email,
     passwordHash,
+    phone,
     role: "driver",
     city,
-    driverStatus: "available",
+    vehicleNumber,
   });
 
   return { id: user._id, name: user.name, email: user.email, role: user.role, city: user.city };
 };
 
 const createManager = async ({ name, email, password, city }) => {
+  validateEmail(email);
+  validateStrongPassword(password);
+
   const existing = await userRepo.findByEmail(email);
   if (existing) throw new ConflictError("Email already registered.");
 
@@ -75,7 +90,6 @@ const createManager = async ({ name, email, password, city }) => {
     passwordHash,
     role: "manager",
     city,
-    isActive: true,
   });
 
   return { id: user._id, name: user.name, email: user.email, role: user.role, city: user.city };

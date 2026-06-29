@@ -9,15 +9,14 @@ const findBookings = (filters) => {
 
   if (filters.status) query.status = filters.status;
   if (filters.city) query.city = filters.city;
-  if (filters.driverRef) query.driverRef = filters.driverRef;
-  if (filters.customerRef) query.customerRef = filters.customerRef;
+  if (filters.driverId) query.driverId = filters.driverId;
 
   if (filters.today) {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     const end = new Date();
     end.setHours(23, 59, 59, 999);
-    query.createdAt = { $gte: start, $lte: end };
+    query.journeyStart = { $gte: start, $lte: end };
   }
 
   if (filters.yesterday) {
@@ -27,24 +26,28 @@ const findBookings = (filters) => {
     const end = new Date();
     end.setDate(end.getDate() - 1);
     end.setHours(23, 59, 59, 999);
-    query.createdAt = { $gte: start, $lte: end };
+    query.journeyStart = { $gte: start, $lte: end };
   }
 
-  if (filters.bookingDate) {
-    const date = new Date(filters.bookingDate);
-    const start = new Date(date.setHours(0, 0, 0, 0));
-    const end = new Date(date.setHours(23, 59, 59, 999));
-    query.bookingTime = { $gte: start, $lte: end };
+  if (filters.search) {
+    const regex = new RegExp(filters.search, "i");
+    query.$or = [
+      { customerName: regex },
+      { customerPhone: regex },
+      { pickupAddress: regex },
+      { dropAddress: regex },
+    ];
   }
 
   return Booking.find(query)
-    .populate("driverRef", "name email")
+    .populate("driverId", "name email phone vehicleNumber")
     .populate("assignedBy", "name email")
-    .populate("cancelledBy", "name email")
     .sort({ createdAt: -1 });
 };
 
 const updateBooking = (id, data) =>
   Booking.findByIdAndUpdate(id, data, { returnDocument: "after" });
 
-module.exports = { create, findById, findBookings, updateBooking };
+const distinctCities = () => Booking.distinct("city");
+
+module.exports = { create, findById, findBookings, updateBooking, distinctCities };

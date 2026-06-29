@@ -1,20 +1,18 @@
 const User = require("../models/User");
 
-const findByEmail = (email) => User.findOne({ email, isActive: true });
+const findByEmail = (email) => User.findOne({ email });
 
 const findById = (id) => User.findById(id);
 
-const findAvailableDrivers = (city) =>
+const findDrivers = (city) =>
   User.find({
     role: "driver",
-    driverStatus: "available",
-    isActive: true,
     ...(city && { city }),
   });
 
 const createUser = (data) => User.create(data);
 
-const updateDriverStatus = (id, status) =>
-  User.findByIdAndUpdate(id, { driverStatus: status }, { returnDocument: "after" });
+const updateUser = (id, data) =>
+  User.findByIdAndUpdate(id, data, { returnDocument: "after" });
 
-module.exports = { findByEmail, findById, findAvailableDrivers, createUser, updateDriverStatus };
+module.exports = { findByEmail, findById, findDrivers, createUser, updateUser };

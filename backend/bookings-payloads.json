@@ -1,0 +1,83 @@
+[
+  {
+    "customerName": "Priya Sharma",
+    "customerPhone": "9812345601",
+    "pickupAddress": "Connaught Place",
+    "dropAddress": "Dwarka Sector 21",
+    "city": "Delhi",
+    "journeyStart": "2026-07-01T10:00:00.000Z",
+    "journeyEnd": "2026-07-01T11:00:00.000Z"
+  },
+  {
+    "customerName": "Arun Kumar",
+    "customerPhone": "9812345602",
+    "pickupAddress": "Saket",
+    "dropAddress": "Noida Sector 62",
+    "city": "Delhi",
+    "journeyStart": "2026-07-01T12:00:00.000Z",
+    "journeyEnd": "2026-07-01T13:00:00.000Z"
+  },
+  {
+    "customerName": "Neha Gupta",
+    "customerPhone": "9812345603",
+    "pickupAddress": "Karol Bagh",
+    "dropAddress": "Lajpat Nagar",
+    "city": "Delhi",
+    "journeyStart": "2026-07-01T14:00:00.000Z",
+    "journeyEnd": "2026-07-01T15:00:00.000Z"
+  },
+  {
+    "customerName": "Rohit Singh",
+    "customerPhone": "9812345604",
+    "pickupAddress": "Sector 29",
+    "dropAddress": "DLF Cyber City",
+    "city": "Gurgaon",
+    "journeyStart": "2026-07-01T11:00:00.000Z",
+    "journeyEnd": "2026-07-01T12:00:00.000Z"
+  },
+  {
+    "customerName": "Anjali Mehta",
+    "customerPhone": "9812345605",
+    "pickupAddress": "Sector 56",
+    "dropAddress": "Medanta Hospital",
+    "city": "Gurgaon",
+    "journeyStart": "2026-07-01T13:00:00.000Z",
+    "journeyEnd": "2026-07-01T14:00:00.000Z"
+  },
+  {
+    "customerName": "Vivek Agarwal",
+    "customerPhone": "9812345606",
+    "pickupAddress": "Sector 14",
+    "dropAddress": "MG Road",
+    "city": "Gurgaon",
+    "journeyStart": "2026-07-01T15:00:00.000Z",
+    "journeyEnd": "2026-07-01T16:00:00.000Z"
+  },
+  {
+    "customerName": "Lakshmi Iyer",
+    "customerPhone": "9812345607",
+    "pickupAddress": "HSR Layout",
+    "dropAddress": "Electronic City",
+    "city": "Bengaluru",
+    "journeyStart": "2026-07-01T10:00:00.000Z",
+    "journeyEnd": "2026-07-01T11:00:00.000Z"
+  },
+  {
+    "customerName": "Karthik Nair",
+    "customerPhone": "9812345608",
+    "pickupAddress": "Indiranagar",
+    "dropAddress": "Whitefield",
+    "city": "Bengaluru",
+    "journeyStart": "2026-07-01T12:00:00.000Z",
+    "journeyEnd": "2026-07-01T13:00:00.000Z"
+  },
+  {
+    "customerName": "Divya Menon",
+    "customerPhone": "9812345609",
+    "pickupAddress": "MG Road",
+    "dropAddress": "Koramangala",
+    "city": "Bengaluru",
+    "journeyStart": "2026-07-01T14:00:00.000Z",
+    "journeyEnd": "2026-07-01T15:00:00.000Z"
+  }
+]

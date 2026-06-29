@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
+const { setIO } = require("../services/notificationService");
 
 let io;
 
@@ -8,6 +9,8 @@ const setupSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: { origin: "*", methods: ["GET", "POST"] },
   });
+
+  setIO(io);
 
   io.use((socket, next) => {
     const token = socket.handshake.auth.token;
@@ -34,19 +37,4 @@ const setupSocket = (httpServer) => {
   return io;
 };
 
-const getIO = () => {
-  if (!io) throw new Error("Socket.io not initialized");
-  return io;
-};
-
-const emitBookingEvent = (event, booking) => {
-  const adminRoom = "admin";
-  const cityRoom = booking.city;
-
-  io.to(adminRoom).emit(event, booking);
-  if (cityRoom) {
-    io.to(cityRoom).emit(event, booking);
-  }
-};
-
-module.exports = { setupSocket, getIO, emitBookingEvent };
+module.exports = { setupSocket };

@@ -1,14 +1,14 @@
 const bookingService = require("../services/bookingService");
-const userRepo = require("../repositories/userRepository");
+const assignmentService = require("../services/assignmentService");
 const { sendSuccess, sendError } = require("../utils/response");
 
 const create = async (req, res, next) => {
   try {
-    const { customerName, customerPhone, pickupLocation, dropLocation, city, bookingTime } = req.body;
-    if (!customerName || !customerPhone || !pickupLocation || !dropLocation || !city || !bookingTime) {
-      return sendError(res, "All fields are required: customerName, customerPhone, pickupLocation, dropLocation, city, bookingTime.", 400);
+    const { customerName, customerPhone, pickupAddress, dropAddress, city, journeyStart, journeyEnd } = req.body;
+    if (!customerName || !customerPhone || !pickupAddress || !dropAddress || !city || !journeyStart || !journeyEnd) {
+      return sendError(res, "All fields are required: customerName, customerPhone, pickupAddress, dropAddress, city, journeyStart, journeyEnd.", 400);
     }
-    const booking = await bookingService.createBooking(req.body, req.user.id);
+    const booking = await bookingService.createBooking(req.body);
     sendSuccess(res, booking, "Booking created.", 201);
   } catch (err) {
     next(err);
@@ -21,7 +21,7 @@ const assign = async (req, res, next) => {
     if (!driverId) {
       return sendError(res, "driverId is required.", 400);
     }
-    const booking = await bookingService.assignBooking(
+    const booking = await assignmentService.assignDriver(
       req.params.id,
       driverId,
       req.user.id,
@@ -36,7 +36,7 @@ const assign = async (req, res, next) => {
 
 const unassign = async (req, res, next) => {
   try {
-    const booking = await bookingService.unassignBooking(
+    const booking = await assignmentService.unassignDriver(
       req.params.id,
       req.user.id,
       req.user.city,
@@ -59,8 +59,8 @@ const complete = async (req, res, next) => {
 
 const cancel = async (req, res, next) => {
   try {
-    const { reason } = req.body;
-    const booking = await bookingService.cancelBooking(
+    const reason = req.body?.reason || "";
+    const booking = await assignmentService.cancelBooking(
       req.params.id,
       req.user.id,
       req.user.role,
@@ -74,13 +74,13 @@ const cancel = async (req, res, next) => {
 
 const list = async (req, res, next) => {
   try {
-    const { status, city, today, yesterday, bookingDate } = req.query;
+    const { status, city, today, yesterday, search } = req.query;
     const filters = {};
     if (status) filters.status = status;
     if (city) filters.city = city;
     if (today) filters.today = true;
     if (yesterday) filters.yesterday = true;
-    if (bookingDate) filters.bookingDate = bookingDate;
+    if (search) filters.search = search;
 
     const bookings = await bookingService.getBookings(filters, req.user);
     sendSuccess(res, bookings, "Bookings fetched.");
@@ -89,21 +89,13 @@ const list = async (req, res, next) => {
   }
 };
 
-const listDrivers = async (req, res, next) => {
+const listCities = async (req, res, next) => {
   try {
-    const { city, availability } = req.query;
-    let drivers;
-    if (availability === "true") {
-      drivers = await userRepo.findAvailableDrivers(city);
-    } else {
-      const filter = { role: "driver", isActive: true };
-      if (city) filter.city = city;
-      drivers = await userRepo.findAvailableDrivers(city); // same query should work
-    }
-    sendSuccess(res, drivers, "Drivers fetched.");
+    const cities = await bookingService.getCities(req.user);
+    sendSuccess(res, cities, "Cities fetched.");
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = { create, assign, unassign, complete, cancel, list, listDrivers };
+module.exports = { create, assign, unassign, complete, cancel, list, listCities };

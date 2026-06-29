@@ -1,20 +1,6 @@
 const mongoose = require("mongoose");
 const { BookingStatus } = require("../utils/constants");
 
-const historyEntrySchema = new mongoose.Schema(
-  {
-    action: { type: String, required: true },
-    performedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    timestamp: { type: Date, default: Date.now },
-    remarks: { type: String },
-  },
-  { _id: false }
-);
-
 const bookingSchema = new mongoose.Schema(
   {
     customerName: {
@@ -27,12 +13,12 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    pickupLocation: {
+    pickupAddress: {
       type: String,
       required: true,
       trim: true,
     },
-    dropLocation: {
+    dropAddress: {
       type: String,
       required: true,
       trim: true,
@@ -42,46 +28,26 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    bookingTime: {
+    journeyStart: {
       type: Date,
       required: true,
     },
-    pickupTime: {
+    journeyEnd: {
       type: Date,
-    },
-    estimatedDropTime: {
-      type: Date,
-    },
-    actualDropTime: {
-      type: Date,
+      required: true,
     },
     status: {
       type: String,
       enum: Object.values(BookingStatus),
       default: BookingStatus.Pending,
     },
-    driverRef: {
+    driverId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
     assignedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    },
-    cancelledBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    customerRef: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    cancelledReason: {
-      type: String,
-    },
-    history: {
-      type: [historyEntrySchema],
-      default: [],
     },
   },
   { timestamps: true }
