@@ -1,6 +1,5 @@
 const bookingRepo = require("../repositories/bookingRepository");
 const userRepo = require("../repositories/userRepository");
-const scheduleService = require("./scheduleService");
 const notificationService = require("./notificationService");
 const { BookingStatus } = require("../utils/constants");
 const { NotFoundError, ValidationError } = require("../utils/errors");
@@ -28,16 +27,17 @@ const assignDriver = async (bookingId, driverId, userId, userCity, userRole) => 
   if (booking.city !== driver.city)
     throw new ValidationError("Driver must be in the same city as the booking.");
 
+  if (booking.vehicleCategory && booking.vehicleCategory !== driver.vehicleCategory)
+    throw new ValidationError(`Booking requires a ${booking.vehicleCategory}, but driver is a ${driver.vehicleCategory}.`);
+
   const rejectedIds = (booking.rejectedBy || []).map((id) => id.toString());
   if (rejectedIds.includes(driverId.toString()))
     throw new ValidationError("This driver has already rejected this booking.");
 
-  const available = await scheduleService.checkAvailability(driverId, booking.journeyStart, booking.journeyEnd);
-  if (!available)
-    throw new ValidationError("Driver is not available during this time slot.");
+  if (driver.driverStatus !== "available")
+    throw new ValidationError("Driver is not available.");
 
-  await scheduleService.removeSchedule(bookingId);
-  await scheduleService.createSchedule(driverId, bookingId, booking.journeyStart, booking.journeyEnd);
+  await _setDriverBusy(driverId, "busy");
 
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.DriverAssigned,
@@ -64,7 +64,6 @@ const unassignDriver = async (bookingId, userId, userCity, userRole) => {
     throw new ValidationError("You can only unassign bookings in your city.");
 
   const driverIdToFree = booking.driverId?._id ?? booking.driverId;
-  await scheduleService.removeSchedule(bookingId);
   if (driverIdToFree) await _setDriverBusy(driverIdToFree, "available");
 
   const updated = await bookingRepo.updateBooking(bookingId, {
@@ -105,12 +104,12 @@ const rejectBooking = async (bookingId, driverId, reason) => {
   console.log(`[Assign] Driver ${driverId} rejecting booking ${bookingId}, reason: "${reason || "none"}"`);
   const booking = await bookingRepo.findById(bookingId);
   if (!booking) throw new NotFoundError("Booking not found.");
-  if (booking.status !== BookingStatus.DriverAssigned)
-    throw new ValidationError("Booking is not in assignable state.");
+  const rejectableStates = [BookingStatus.DriverAssigned, BookingStatus.DriverAccepted];
+  if (!rejectableStates.includes(booking.status))
+    throw new ValidationError("Booking cannot be rejected in its current status.");
   if (String(booking.driverId?._id ?? booking.driverId) !== driverId)
     throw new ValidationError("You are not the assigned driver.");
 
-  await scheduleService.removeSchedule(bookingId);
   await _setDriverBusy(driverId, "available");
 
   const updated = await bookingRepo.updateBooking(bookingId, {
@@ -164,7 +163,6 @@ const timeoutAssignment = async (bookingId) => {
     throw new ValidationError("Booking is not in assigned state.");
 
   const driverIdToFree = booking.driverId?._id ?? booking.driverId;
-  await scheduleService.removeSchedule(bookingId);
   if (driverIdToFree) await _setDriverBusy(driverIdToFree, "available");
 
   const updated = await bookingRepo.updateBooking(bookingId, {
@@ -195,7 +193,6 @@ const cancelBooking = async (bookingId, userId, userRole, reason) => {
     BookingStatus.CustomerOnboarded, BookingStatus.TripInProgress,
   ];
   if (assignedStates.includes(booking.status)) {
-    await scheduleService.removeSchedule(bookingId);
     const dId = booking.driverId?._id ?? booking.driverId;
     if (dId) await _setDriverBusy(dId, "available");
   }

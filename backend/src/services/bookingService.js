@@ -1,15 +1,11 @@
 const bookingRepo = require("../repositories/bookingRepository");
 const userRepo = require("../repositories/userRepository");
-const scheduleService = require("./scheduleService");
 const notificationService = require("./notificationService");
 const { BookingStatus } = require("../utils/constants");
 const { NotFoundError, ValidationError } = require("../utils/errors");
 
 const createBooking = async (data) => {
-  const { journeyStart, journeyEnd } = data;
-
-  if (new Date(journeyStart) >= new Date(journeyEnd))
-    throw new ValidationError("journeyStart must be before journeyEnd.");
+  const { journeyStart } = data;
 
   if (new Date(journeyStart) < new Date())
     throw new ValidationError("Booking cannot be in the past.");
@@ -20,8 +16,8 @@ const createBooking = async (data) => {
     pickupAddress: data.pickupAddress,
     dropAddress: data.dropAddress,
     journeyStart: data.journeyStart,
-    journeyEnd: data.journeyEnd,
     city: data.city,
+    vehicleCategory: data.vehicleType || data.vehicleCategory,
     status: BookingStatus.Pending,
   });
 
@@ -48,13 +44,14 @@ const completeBooking = async (bookingId, userId) => {
   if (booking.status !== BookingStatus.TripInProgress)
     throw new ValidationError("Only trips in progress can be completed.");
 
-  await scheduleService.removeSchedule(bookingId);
   const dId = booking.driverId?._id ?? booking.driverId;
   if (dId) await userRepo.updateUser(dId, { driverStatus: "available" });
 
+  const now = new Date();
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.Completed,
-    completedAt: new Date(),
+    completedAt: now,
+    journeyEnd: now,
   });
 
   const populated = await bookingRepo.findById(bookingId);

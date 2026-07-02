@@ -42,7 +42,9 @@ export default function BookingDetailPanel({ booking, onClose }) {
         <div className={styles.section}>
           <h4 className={styles.sectionTitle}>Journey</h4>
           <div className={styles.row}><span className={styles.label}>Start</span><span>{new Date(booking.journeyStart).toLocaleString()}</span></div>
-          <div className={styles.row}><span className={styles.label}>End</span><span>{new Date(booking.journeyEnd).toLocaleString()}</span></div>
+          {booking.journeyEnd && (
+            <div className={styles.row}><span className={styles.label}>End</span><span>{new Date(booking.journeyEnd).toLocaleString()}</span></div>
+          )}
         </div>
 
         {driver && (

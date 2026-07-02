@@ -5,12 +5,13 @@ const User = require("../models/User");
 
 const MAX_CANDIDATES = 5;
 
-const fetchNearbyDrivers = async (city, pickupLat, pickupLng, excludeDriverIds = []) => {
+const fetchNearbyDrivers = async (city, pickupLat, pickupLng,vehicleCategory, excludeDriverIds = []) => {
   console.log(`[DriverSelection] Finding drivers in ${city}, excluding ${excludeDriverIds.length} previously rejected/timeout drivers`);
   const drivers = await User.find({
     role: "driver",
     city,
     driverStatus: "available",
+    vehicleCategory: vehicleCategory,
     _id: { $nin: excludeDriverIds },
   }).select("name email phone vehicleNumber vehicleModel seatingCapacity vehicleCategory driverStatus");
 
@@ -105,12 +106,12 @@ const enrichWithGoogleETA = async (drivers, pickupLat, pickupLng) => {
   }
 };
 
-const getPrioritizedDrivers = async (city, pickupLat, pickupLng, excludeDriverIds = []) => {
+const getPrioritizedDrivers = async (city, pickupLat, pickupLng, vehicleCategory, excludeDriverIds = []) => {
   if (!pickupLat || !pickupLng) {
     throw new Error("pickupLat and pickupLng are required.");
   }
 
-  let drivers = await fetchNearbyDrivers(city, pickupLat, pickupLng, excludeDriverIds);
+  let drivers = await fetchNearbyDrivers(city, pickupLat, pickupLng, vehicleCategory, excludeDriverIds);
   drivers = await enrichWithGoogleETA(drivers, pickupLat, pickupLng);
 
   if (drivers[0]?.etaValue) {

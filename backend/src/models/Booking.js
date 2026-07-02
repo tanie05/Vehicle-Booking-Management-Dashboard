@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { BookingStatus } = require("../utils/constants");
-
+const { VehicleCategory } = require("../utils/constants");
 const bookingSchema = new mongoose.Schema(
   {
     customerName: {
@@ -34,7 +34,6 @@ const bookingSchema = new mongoose.Schema(
     },
     journeyEnd: {
       type: Date,
-      required: true,
     },
     status: {
       type: String,
@@ -62,6 +61,10 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     }],
+    vehicleCategory: {
+      type: String,
+      enum: Object.values(VehicleCategory),
+    },
     assignedAt: { type: Date },
     acceptedAt: { type: Date },
     goingToPickupAt: { type: Date },

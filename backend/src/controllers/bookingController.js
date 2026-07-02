@@ -5,9 +5,9 @@ const { sendSuccess, sendError } = require("../utils/response");
 
 const create = async (req, res, next) => {
   try {
-    const { customerName, customerPhone, pickupAddress, dropAddress, city, journeyStart, journeyEnd } = req.body;
-    if (!customerName || !customerPhone || !pickupAddress || !dropAddress || !city || !journeyStart || !journeyEnd) {
-      return sendError(res, "All fields are required: customerName, customerPhone, pickupAddress, dropAddress, city, journeyStart, journeyEnd.", 400);
+    const { customerName, customerPhone, pickupAddress, dropAddress, city, journeyStart, vehicleType } = req.body;
+    if (!customerName || !customerPhone || !pickupAddress || !dropAddress || !city || !journeyStart || !vehicleType) {
+      return sendError(res, "All fields are required: customerName, customerPhone, pickupAddress, dropAddress, city, journeyStart, vehicleType.", 400);
     }
     const booking = await bookingService.createBooking(req.body);
     sendSuccess(res, booking, "Booking created.", 201);
@@ -83,7 +83,8 @@ const complete = async (req, res, next) => {
 
 const cancel = async (req, res, next) => {
   try {
-    const reason = req.body?.reason || "";
+    const { reason } = req.body;
+    if (!reason) return sendError(res, "reason is required to cancel a booking.", 400);
     const booking = await assignmentService.cancelBooking(
       req.params.id, req.user.id, req.user.role, reason
     );
@@ -109,6 +110,7 @@ const nearbyDrivers = async (req, res, next) => {
       booking.city,
       parseFloat(pickupLat),
       parseFloat(pickupLng),
+      booking.vehicleCategory,
       excludeIds
     );
 
