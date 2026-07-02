@@ -1,4 +1,5 @@
 const bookingRepo = require("../repositories/bookingRepository");
+const scheduleService = require("./scheduleService");
 const notificationService = require("./notificationService");
 const { BookingStatus } = require("../utils/constants");
 const { NotFoundError, ValidationError } = require("../utils/errors");
@@ -43,11 +44,14 @@ const getBookings = async (filters, user) => {
 const completeBooking = async (bookingId, userId) => {
   const booking = await bookingRepo.findById(bookingId);
   if (!booking) throw new NotFoundError("Booking not found.");
-  if (booking.status !== BookingStatus.Assigned)
-    throw new ValidationError("Only assigned bookings can be completed.");
+  if (booking.status !== BookingStatus.TripInProgress)
+    throw new ValidationError("Only trips in progress can be completed.");
+
+  await scheduleService.removeSchedule(bookingId);
 
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.Completed,
+    completedAt: new Date(),
   });
 
   const populated = await bookingRepo.findById(bookingId);

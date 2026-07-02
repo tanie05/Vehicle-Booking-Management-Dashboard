@@ -22,11 +22,7 @@ const assign = async (req, res, next) => {
       return sendError(res, "driverId is required.", 400);
     }
     const booking = await assignmentService.assignDriver(
-      req.params.id,
-      driverId,
-      req.user.id,
-      req.user.city,
-      req.user.role
+      req.params.id, driverId, req.user.id, req.user.city, req.user.role
     );
     sendSuccess(res, booking, "Booking assigned.");
   } catch (err) {
@@ -37,12 +33,39 @@ const assign = async (req, res, next) => {
 const unassign = async (req, res, next) => {
   try {
     const booking = await assignmentService.unassignDriver(
-      req.params.id,
-      req.user.id,
-      req.user.city,
-      req.user.role
+      req.params.id, req.user.id, req.user.city, req.user.role
     );
     sendSuccess(res, booking, "Booking unassigned.");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const accept = async (req, res, next) => {
+  try {
+    const booking = await assignmentService.acceptBooking(req.params.id, req.user.id);
+    sendSuccess(res, booking, "Booking accepted.");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const reject = async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const booking = await assignmentService.rejectBooking(req.params.id, req.user.id, reason);
+    sendSuccess(res, booking, "Booking rejected.");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    if (!status) return sendError(res, "status is required.", 400);
+    const booking = await assignmentService.updateDriverStatus(req.params.id, req.user.id, status);
+    sendSuccess(res, booking, "Status updated.");
   } catch (err) {
     next(err);
   }
@@ -61,10 +84,7 @@ const cancel = async (req, res, next) => {
   try {
     const reason = req.body?.reason || "";
     const booking = await assignmentService.cancelBooking(
-      req.params.id,
-      req.user.id,
-      req.user.role,
-      reason
+      req.params.id, req.user.id, req.user.role, reason
     );
     sendSuccess(res, booking, "Booking cancelled.");
   } catch (err) {
@@ -98,4 +118,4 @@ const listCities = async (req, res, next) => {
   }
 };
 
-module.exports = { create, assign, unassign, complete, cancel, list, listCities };
+module.exports = { create, assign, unassign, accept, reject, updateStatus, complete, cancel, list, listCities };

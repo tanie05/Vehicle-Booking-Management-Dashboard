@@ -40,7 +40,7 @@ const findBookings = (filters) => {
   }
 
   return Booking.find(query)
-    .populate("driverId", "name email phone vehicleNumber")
+    .populate("driverId", "name email phone vehicleNumber vehicleModel seatingCapacity vehicleCategory driverStatus")
     .populate("assignedBy", "name email")
     .sort({ createdAt: -1 });
 };
@@ -48,6 +48,12 @@ const findBookings = (filters) => {
 const updateBooking = (id, data) =>
   Booking.findByIdAndUpdate(id, data, { returnDocument: "after" });
 
+const findStaleAssignments = (cutoff) =>
+  Booking.find({
+    status: "driver_assigned",
+    assignedAt: { $lt: cutoff },
+  });
+
 const distinctCities = () => Booking.distinct("city");
 
-module.exports = { create, findById, findBookings, updateBooking, distinctCities };
+module.exports = { create, findById, findBookings, updateBooking, findStaleAssignments, distinctCities };

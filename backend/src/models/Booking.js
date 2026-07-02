@@ -49,8 +49,25 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    rejectionReason: {
+      type: String,
+      trim: true,
+    },
+    assignedAt: { type: Date },
+    acceptedAt: { type: Date },
+    goingToPickupAt: { type: Date },
+    arrivedAt: { type: Date },
+    onboardedAt: { type: Date },
+    tripStartedAt: { type: Date },
+    completedAt: { type: Date },
+    cancelledAt: { type: Date },
+    timedOutAt: { type: Date },
   },
   { timestamps: true }
 );
+
+bookingSchema.index({ city: 1, status: 1, createdAt: -1 });
+bookingSchema.index({ driverId: 1, createdAt: -1 });
+bookingSchema.index({ status: 1, assignedAt: 1 });
 
 module.exports = mongoose.model("Booking", bookingSchema);

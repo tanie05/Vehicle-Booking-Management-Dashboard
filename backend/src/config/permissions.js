@@ -23,6 +23,15 @@ const permissions = {
   "/api/bookings/:id/cancel": {
     PATCH: ["admin", "manager", "driver", "customer"],
   },
+  "/api/bookings/:id/accept": {
+    PATCH: ["driver"],
+  },
+  "/api/bookings/:id/reject": {
+    PATCH: ["driver"],
+  },
+  "/api/bookings/:id/status": {
+    PATCH: ["driver"],
+  },
 };
 
 const patternCache = {};
