@@ -1,6 +1,7 @@
 .container {
   max-width: 360px;
   margin: 60px auto;
+  padding: 0 16px;
 }
 
 .heading {
@@ -22,6 +23,8 @@
   border-radius: 6px;
   border: 1px solid #cbd5e1;
   font-size: 14px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .submitBtn {
@@ -38,4 +41,10 @@
 .footer {
   font-size: 14px;
   margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    margin: 40px auto;
+  }
 }

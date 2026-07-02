@@ -13,6 +13,16 @@
   font-size: 14px;
 }
 
+.driverCol {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .driverCol {
+    display: none;
+  }
+}
+
 .th {
   composes: cell;
   text-align: left;

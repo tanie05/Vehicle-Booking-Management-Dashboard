@@ -76,7 +76,7 @@ export default function BookingTable({ bookings, onRefresh, user, onViewTimeline
             <tr>
               <th className={styles.th}>Customer</th>
               <th className={styles.th}>Status</th>
-              <th className={styles.th}>Driver</th>
+              <th className={`${styles.th} ${styles.driverCol}`}>Driver</th>
               <th className={styles.th}>Actions</th>
             </tr>
           </thead>
@@ -88,7 +88,7 @@ export default function BookingTable({ bookings, onRefresh, user, onViewTimeline
                   <span className={styles.muted}>{b.customerPhone}</span>
                 </td>
                 <td className={styles.cell}><StatusBadge status={b.status} /></td>
-                <td className={styles.cell}>
+                <td className={`${styles.cell} ${styles.driverCol}`}>
                   {b.driverId ? (
                     <div>
                       <strong>{b.driverId.name}</strong><br />
@@ -136,7 +136,7 @@ function RowActions({ booking, user, onAssign, onAccept, onReject, onStatus, onU
 
   return (
     <div className={styles.actions}>
-      <button className={styles.btnTimeline} onClick={onViewTimeline}>View Timeline</button>
+      <button className={styles.btnTimeline} onClick={onViewTimeline}>Details</button>
 
       {isMgr && (s === "pending" || s === "driver_rejected" || s === "assignment_timeout") &&
         <button className={styles.btn} onClick={onAssign}>Assign</button>}

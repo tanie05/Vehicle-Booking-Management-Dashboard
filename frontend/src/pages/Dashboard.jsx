@@ -4,6 +4,7 @@ import useBookings from "../hooks/useBookings";
 import BookingFilters from "../components/BookingFilters";
 import BookingTable from "../components/BookingTable";
 import SummaryCards from "../components/SummaryCards";
+import Navbar from "../components/Navbar";
 import BookingDetailPanel from "../components/BookingDetailPanel";
 import styles from "./Dashboard.module.css";
 
@@ -59,13 +60,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className={styles.header}>
-        <h2 className={styles.headerTitle}>Dashboard {isDriver && <span className={styles.driverBadge}>Driver View</span>}</h2>
-        <div className={styles.userInfo}>
-          <span>{user?.name} ({user?.role}){user?.city && ` — ${user.city}`}</span>
-          <button onClick={logout} className={styles.logoutBtn}>Logout</button>
-        </div>
-      </div>
+      <Navbar user={user} logout={logout} badge={isDriver ? "Driver View" : null} />
 
       {!isDriver && <BookingFilters filters={filters} setFilters={setFilters} user={user} />}
 
