@@ -1,5 +1,6 @@
 const bookingService = require("../services/bookingService");
 const assignmentService = require("../services/assignmentService");
+const driverSelectionService = require("../services/driverSelectionService");
 const { sendSuccess, sendError } = require("../utils/response");
 
 const create = async (req, res, next) => {
@@ -92,6 +93,28 @@ const cancel = async (req, res, next) => {
   }
 };
 
+const nearbyDrivers = async (req, res, next) => {
+  try {
+    const { pickupLat, pickupLng } = req.query;
+    const booking = await bookingService.getBookingById(req.params.id);
+    if (!booking) return sendError(res, "Booking not found.", 404);
+
+    if (!pickupLat || !pickupLng) {
+      return sendError(res, "pickupLat and pickupLng query params are required.", 400);
+    }
+
+    const drivers = await driverSelectionService.getPrioritizedDrivers(
+      booking.city,
+      parseFloat(pickupLat),
+      parseFloat(pickupLng)
+    );
+
+    sendSuccess(res, { booking, drivers }, "Nearby drivers fetched.");
+  } catch (err) {
+    next(err);
+  }
+};
+
 const list = async (req, res, next) => {
   try {
     const { status, city, today, yesterday, search } = req.query;
@@ -118,4 +141,4 @@ const listCities = async (req, res, next) => {
   }
 };
 
-module.exports = { create, assign, unassign, accept, reject, updateStatus, complete, cancel, list, listCities };
+module.exports = { create, assign, unassign, accept, reject, updateStatus, complete, cancel, nearbyDrivers, list, listCities };

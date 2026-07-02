@@ -6,7 +6,7 @@ const { sendSuccess } = require("../utils/response");
 
 router.get("/", authenticate, checkPermission, async (req, res, next) => {
   try {
-    const { city, availableOnly } = req.query;
+    const { city, availableOnly, driverStatus } = req.query;
     const filter = { role: "driver" };
 
     if (req.user.role === "manager") {
@@ -15,18 +15,22 @@ router.get("/", authenticate, checkPermission, async (req, res, next) => {
       filter.city = city;
     }
 
-    let drivers = await User.find(filter).select("name email phone city vehicleNumber");
+    if (driverStatus) {
+      filter.driverStatus = driverStatus;
+    }
+
+    const selectFields = "name email phone city vehicleNumber vehicleModel seatingCapacity vehicleCategory driverStatus";
+    let drivers = await User.find(filter).select(selectFields);
 
     if (availableOnly === "true") {
+      drivers = drivers.filter((d) => d.driverStatus === "available");
       const now = new Date();
-      const available = [];
+      const noSchedule = [];
       for (const driver of drivers) {
         const overlap = await scheduleRepo.findOverlapping(driver._id, now, now);
-        if (!overlap) {
-          available.push(driver);
-        }
+        if (!overlap) noSchedule.push(driver);
       }
-      drivers = available;
+      drivers = noSchedule;
     }
 
     sendSuccess(res, drivers, "Drivers fetched.");

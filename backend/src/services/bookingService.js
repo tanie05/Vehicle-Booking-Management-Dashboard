@@ -1,4 +1,5 @@
 const bookingRepo = require("../repositories/bookingRepository");
+const userRepo = require("../repositories/userRepository");
 const scheduleService = require("./scheduleService");
 const notificationService = require("./notificationService");
 const { BookingStatus } = require("../utils/constants");
@@ -48,6 +49,7 @@ const completeBooking = async (bookingId, userId) => {
     throw new ValidationError("Only trips in progress can be completed.");
 
   await scheduleService.removeSchedule(bookingId);
+  if (booking.driverId) await userRepo.updateUser(booking.driverId, { driverStatus: "available" });
 
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.Completed,
@@ -59,9 +61,11 @@ const completeBooking = async (bookingId, userId) => {
   return updated;
 };
 
+const getBookingById = async (id) => bookingRepo.findById(id);
+
 const getCities = async (user) => {
   if (user.role === "manager") return [user.city];
   return bookingRepo.distinctCities();
 };
 
-module.exports = { createBooking, getBookings, completeBooking, getCities };
+module.exports = { createBooking, getBookings, getBookingById, completeBooking, getCities };
