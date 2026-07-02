@@ -20,6 +20,9 @@ const permissions = {
   "/api/bookings/:id/complete": {
     PATCH: ["admin", "manager", "driver"],
   },
+  "/api/bookings/:id/nearby-drivers": {
+    GET: ["admin", "manager"],
+  },
   "/api/bookings/:id/cancel": {
     PATCH: ["admin", "manager", "driver", "customer"],
   },

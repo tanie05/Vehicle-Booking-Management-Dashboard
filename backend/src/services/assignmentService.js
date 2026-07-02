@@ -5,6 +5,9 @@ const notificationService = require("./notificationService");
 const { BookingStatus } = require("../utils/constants");
 const { NotFoundError, ValidationError } = require("../utils/errors");
 
+const _setDriverBusy = (driverId, status) =>
+  userRepo.updateUser(driverId, { driverStatus: status });
+
 const assignDriver = async (bookingId, driverId, userId, userCity, userRole) => {
   const booking = await bookingRepo.findById(bookingId);
   if (!booking) throw new NotFoundError("Booking not found.");
@@ -53,7 +56,9 @@ const unassignDriver = async (bookingId, userId, userCity, userRole) => {
   if (userRole === "manager" && booking.city !== userCity)
     throw new ValidationError("You can only unassign bookings in your city.");
 
+  const driverIdToFree = booking.driverId;
   await scheduleService.removeSchedule(bookingId);
+  if (driverIdToFree) await _setDriverBusy(driverIdToFree, "available");
 
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.Pending,
@@ -75,6 +80,8 @@ const acceptBooking = async (bookingId, driverId) => {
   if (booking.driverId?.toString() !== driverId)
     throw new ValidationError("You are not the assigned driver.");
 
+  await _setDriverBusy(driverId, "busy");
+
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.DriverAccepted,
     acceptedAt: new Date(),
@@ -94,6 +101,7 @@ const rejectBooking = async (bookingId, driverId, reason) => {
     throw new ValidationError("You are not the assigned driver.");
 
   await scheduleService.removeSchedule(bookingId);
+  await _setDriverBusy(driverId, "available");
 
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.DriverRejected,
@@ -139,7 +147,9 @@ const timeoutAssignment = async (bookingId) => {
   if (booking.status !== BookingStatus.DriverAssigned)
     throw new ValidationError("Booking is not in assigned state.");
 
+  const driverIdToFree = booking.driverId;
   await scheduleService.removeSchedule(bookingId);
+  if (driverIdToFree) await _setDriverBusy(driverIdToFree, "available");
 
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.AssignmentTimeout,
@@ -166,6 +176,7 @@ const cancelBooking = async (bookingId, userId, userRole, reason) => {
   ];
   if (assignedStates.includes(booking.status)) {
     await scheduleService.removeSchedule(bookingId);
+    if (booking.driverId) await _setDriverBusy(booking.driverId, "available");
   }
 
   const updated = await bookingRepo.updateBooking(bookingId, {

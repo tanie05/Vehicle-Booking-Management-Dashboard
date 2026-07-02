@@ -11,7 +11,6 @@ const createSchedule = async (driverId, bookingId, from, to) =>
 
 const removeSchedule = async (bookingId) => {
   const schedule = await scheduleRepo.deleteByBookingId(bookingId);
-  if (!schedule) throw new NotFoundError("Schedule not found for this booking.");
   return schedule;
 };
 
