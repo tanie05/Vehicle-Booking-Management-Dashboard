@@ -49,7 +49,8 @@ const completeBooking = async (bookingId, userId) => {
     throw new ValidationError("Only trips in progress can be completed.");
 
   await scheduleService.removeSchedule(bookingId);
-  if (booking.driverId) await userRepo.updateUser(booking.driverId, { driverStatus: "available" });
+  const dId = booking.driverId?._id ?? booking.driverId;
+  if (dId) await userRepo.updateUser(dId, { driverStatus: "available" });
 
   const updated = await bookingRepo.updateBooking(bookingId, {
     status: BookingStatus.Completed,
@@ -58,7 +59,7 @@ const completeBooking = async (bookingId, userId) => {
 
   const populated = await bookingRepo.findById(bookingId);
   notificationService.emitBookingEvent("booking-completed", populated);
-  return updated;
+  return populated;
 };
 
 const getBookingById = async (id) => bookingRepo.findById(id);

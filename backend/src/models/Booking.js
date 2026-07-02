@@ -53,6 +53,15 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    cancellationReason: {
+      type: String,
+      trim: true,
+    },
+    rejectedAt: { type: Date },
+    rejectedBy: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
     assignedAt: { type: Date },
     acceptedAt: { type: Date },
     goingToPickupAt: { type: Date },

@@ -5,12 +5,16 @@ const User = require("../models/User");
 
 const MAX_CANDIDATES = 5;
 
-const fetchNearbyDrivers = async (city, pickupLat, pickupLng) => {
+const fetchNearbyDrivers = async (city, pickupLat, pickupLng, excludeDriverIds = []) => {
+  console.log(`[DriverSelection] Finding drivers in ${city}, excluding ${excludeDriverIds.length} previously rejected/timeout drivers`);
   const drivers = await User.find({
     role: "driver",
     city,
     driverStatus: "available",
+    _id: { $nin: excludeDriverIds },
   }).select("name email phone vehicleNumber vehicleModel seatingCapacity vehicleCategory driverStatus");
+
+  console.log(`[DriverSelection] Found ${drivers.length} available drivers in ${city}`);
 
   const withDistance = drivers
     .map((d) => {
@@ -37,50 +41,83 @@ const fetchNearbyDrivers = async (city, pickupLat, pickupLng) => {
   return withDistance;
 };
 
+const _waypoint = (lat, lng) => ({
+  waypoint: { location: { latLng: { latitude: lat, longitude: lng } } },
+});
+
+const _formatDistance = (meters) => {
+  if (!meters && meters !== 0) return null;
+  return meters >= 1000 ? `${(meters / 1000).toFixed(1)} km` : `${meters} m`;
+};
+
+const _formatDuration = (seconds) => {
+  if (!seconds && seconds !== 0) return null;
+  const mins = Math.round(seconds / 60);
+  if (mins < 60) return `${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m ? `${h} hr ${m} min` : `${h} hr`;
+};
+
 const enrichWithGoogleETA = async (drivers, pickupLat, pickupLng) => {
   if (!config.googleApiKey || drivers.length === 0) return drivers;
 
-  const origins = drivers.map((d) => `${d.location.lat},${d.location.lng}`).join("|");
-  const dest = `${pickupLat},${pickupLng}`;
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${dest}&key=${config.googleApiKey}`;
+  const body = {
+    origins: drivers.map((d) => _waypoint(d.location.lat, d.location.lng)),
+    destinations: [_waypoint(pickupLat, pickupLng)],
+    travelMode: "DRIVE",
+    routingPreference: "TRAFFIC_AWARE",
+  };
 
   try {
-    const res = await fetch(url);
-    const data = await res.json();
+    const res = await fetch("https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": config.googleApiKey,
+        "X-Goog-FieldMask": "originIndex,destinationIndex,duration,distanceMeters,condition",
+      },
+      body: JSON.stringify(body),
+    });
 
-    if (data.status !== "OK") {
-      console.warn("Google Distance Matrix API error:", data.status);
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.warn("Routes API error:", res.status, errText);
       return drivers;
     }
 
+    const entries = await res.json();
+
     return drivers.map((d, i) => {
-      const element = data.rows[i]?.elements?.[0];
+      const entry = Array.isArray(entries) ? entries.find((e) => e.originIndex === i) : null;
+      const durationSec = entry?.duration ? parseFloat(entry.duration.replace("s", "")) : null;
       return {
         ...d,
-        drivingDistance: element?.distance?.text || null,
-        drivingDistanceValue: element?.distance?.value || null,
-        eta: element?.duration?.text || null,
-        etaValue: element?.duration?.value || null,
+        drivingDistance: _formatDistance(entry?.distanceMeters),
+        drivingDistanceValue: entry?.distanceMeters ?? null,
+        eta: _formatDuration(durationSec),
+        etaValue: durationSec,
       };
     });
   } catch (err) {
-    console.warn("Google Distance Matrix API call failed:", err.message);
+    console.warn("Routes API call failed:", err.message);
     return drivers;
   }
 };
 
-const getPrioritizedDrivers = async (city, pickupLat, pickupLng) => {
+const getPrioritizedDrivers = async (city, pickupLat, pickupLng, excludeDriverIds = []) => {
   if (!pickupLat || !pickupLng) {
     throw new Error("pickupLat and pickupLng are required.");
   }
 
-  let drivers = await fetchNearbyDrivers(city, pickupLat, pickupLng);
+  let drivers = await fetchNearbyDrivers(city, pickupLat, pickupLng, excludeDriverIds);
   drivers = await enrichWithGoogleETA(drivers, pickupLat, pickupLng);
 
   if (drivers[0]?.etaValue) {
     drivers.sort((a, b) => a.etaValue - b.etaValue);
   }
 
+  console.log(`[DriverSelection] Returning ${drivers.length} prioritized drivers: ${drivers.map(d => d.name).join(", ")}`);
   return drivers;
 };
 

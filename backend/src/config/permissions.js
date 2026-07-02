@@ -1,4 +1,7 @@
 const permissions = {
+  "/api/users": {
+    POST: ["admin", "manager"],
+  },
   "/api/users/:id/role": {
     PATCH: ["admin"],
   },
@@ -6,7 +9,7 @@ const permissions = {
     GET: ["admin", "manager"],
   },
   "/api/bookings": {
-    GET: ["admin", "manager", "driver", "customer"],
+    GET: ["admin", "manager", "driver"],
   },
   "/api/bookings/cities": {
     GET: ["admin", "manager"],

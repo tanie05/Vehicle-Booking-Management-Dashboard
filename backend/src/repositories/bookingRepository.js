@@ -2,7 +2,10 @@ const Booking = require("../models/Booking");
 
 const create = (data) => Booking.create(data);
 
-const findById = (id) => Booking.findById(id);
+const findById = (id) =>
+  Booking.findById(id)
+    .populate("driverId", "name email phone vehicleNumber vehicleModel seatingCapacity vehicleCategory driverStatus")
+    .populate("assignedBy", "name email");
 
 const findBookings = (filters) => {
   const query = {};
@@ -11,21 +14,9 @@ const findBookings = (filters) => {
   if (filters.city) query.city = filters.city;
   if (filters.driverId) query.driverId = filters.driverId;
 
-  if (filters.today) {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date();
-    end.setHours(23, 59, 59, 999);
-    query.journeyStart = { $gte: start, $lte: end };
-  }
-
-  if (filters.yesterday) {
-    const start = new Date();
-    start.setDate(start.getDate() - 1);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date();
-    end.setDate(end.getDate() - 1);
-    end.setHours(23, 59, 59, 999);
+  if (filters.date) {
+    const start = new Date(filters.date + "T00:00:00");
+    const end = new Date(filters.date + "T23:59:59");
     query.journeyStart = { $gte: start, $lte: end };
   }
 
