@@ -1,48 +1,32 @@
 import styles from "./SummaryCards.module.css";
 
-const statusColors = {
-  pending: "#f59e0b",
-  assigned: "#3b82f6",
-  completed: "#22c55e",
-  cancelled: "#ef4444",
-};
-
-const labels = {
-  pending: "Pending",
-  assigned: "Assigned",
-  completed: "Completed",
-  cancelled: "Cancelled",
-};
+const CARDS = [
+  { status: "pending", label: "Pending", color: "#f59e0b" },
+  { status: "driver_assigned", label: "Assigned", color: "#3b82f6" },
+  { status: "trip_in_progress", label: "Active", color: "#059669" },
+  { status: "completed", label: "Completed", color: "#22c55e" },
+  { status: "driver_rejected", label: "Rejected", color: "#e11d48" },
+  { status: "assignment_timeout", label: "Timed Out", color: "#dc2626" },
+  { status: "cancelled", label: "Cancelled", color: "#94a3b8" },
+];
 
 export default function SummaryCards({ bookings }) {
   const counts = {};
   for (const b of bookings) {
-    const s = b.status;
-    counts[s] = (counts[s] || 0) + 1;
+    counts[b.status] = (counts[b.status] || 0) + 1;
   }
-
-  const total = bookings.length;
-  const cards = ["pending", "assigned", "completed", "cancelled"];
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <div className={styles.count}>{total}</div>
+        <div className={styles.count}>{bookings.length}</div>
         <div className={styles.label}>Total</div>
       </div>
-      {cards.map((status) => (
-        <div
-          key={status}
-          className={styles.card}
-          style={{
-            border: `1px solid ${statusColors[status]}40`,
-            borderLeft: `4px solid ${statusColors[status]}`,
-          }}
-        >
-          <div className={styles.count} style={{ color: statusColors[status] }}>
-            {counts[status] || 0}
-          </div>
-          <div className={styles.label}>{labels[status]}</div>
+      {CARDS.map(({ status, label, color }) => (
+        <div key={status} className={styles.card}
+          style={{ border: `1px solid ${color}40`, borderLeft: `4px solid ${color}` }}>
+          <div className={styles.count} style={{ color }}>{counts[status] || 0}</div>
+          <div className={styles.label}>{label}</div>
         </div>
       ))}
     </div>

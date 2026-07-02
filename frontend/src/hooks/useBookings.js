@@ -10,13 +10,13 @@ export default function useBookings(filters) {
     const p = {};
     if (filters.status) p.status = filters.status;
     if (filters.city) p.city = filters.city;
-    if (filters.today) p.today = true;
-    if (filters.yesterday) p.yesterday = true;
+    if (filters.date) p.date = filters.date;
     if (filters.search) p.search = filters.search;
     return p;
   }, [filters]);
 
   const fetchBookings = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await getBookings(params);
       setBookings(res.data.data);
@@ -31,11 +31,10 @@ export default function useBookings(filters) {
 
   const socketEvents = useMemo(
     () => [
-      "booking-created",
-      "booking-assigned",
-      "booking-unassigned",
-      "booking-completed",
-      "booking-cancelled",
+      "booking-created", "booking-assigned", "booking-unassigned",
+      "booking-accepted", "booking-rejected", "booking-going-to-pickup",
+      "booking-arrived", "booking-onboarded", "booking-trip-started",
+      "booking-completed", "booking-cancelled", "booking-timeout",
     ],
     []
   );

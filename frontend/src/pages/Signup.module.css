@@ -1,6 +1,7 @@
 .container {
   max-width: 400px;
   margin: 40px auto;
+  padding: 0 16px;
 }
 
 .heading {
@@ -56,4 +57,10 @@
   font-size: 14px;
   margin-top: 16px;
   text-align: center;
+}
+
+@media (max-width: 640px) {
+  .container {
+    margin: 24px auto;
+  }
 }

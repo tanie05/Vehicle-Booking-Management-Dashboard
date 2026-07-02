@@ -22,31 +22,33 @@
   cursor: pointer;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.headerTitle {
-  margin: 0;
-}
-
-.userInfo {
-  font-size: 14px;
-}
-
-.logoutBtn {
-  margin-left: 12px;
-  padding: 4px 12px;
-  border-radius: 4px;
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  cursor: pointer;
-  font-size: 13px;
-}
-
 .loading {
   color: #94a3b8;
+}
+
+.container {
+  display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+}
+
+.skeletonCard {
+  flex: 1; min-width: 120px; padding: 12px 16px;
+  border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0;
+  min-height: 60px;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonRow {
+  padding: 12px; border-bottom: 1px solid #e2e8f0;
+  display: flex; gap: 16px;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonLine {
+  background: #e2e8f0; height: 14px; border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }

@@ -103,10 +103,13 @@ const nearbyDrivers = async (req, res, next) => {
       return sendError(res, "pickupLat and pickupLng query params are required.", 400);
     }
 
+    const excludeIds = (booking.rejectedBy || []).map((id) => id.toString());
+    console.log(`[Booking ${req.params.id}] Fetching nearby drivers for ${booking.customerName} in ${booking.city}, ${excludeIds.length} excluded`);
     const drivers = await driverSelectionService.getPrioritizedDrivers(
       booking.city,
       parseFloat(pickupLat),
-      parseFloat(pickupLng)
+      parseFloat(pickupLng),
+      excludeIds
     );
 
     sendSuccess(res, { booking, drivers }, "Nearby drivers fetched.");
@@ -117,12 +120,11 @@ const nearbyDrivers = async (req, res, next) => {
 
 const list = async (req, res, next) => {
   try {
-    const { status, city, today, yesterday, search } = req.query;
+    const { status, city, date, search } = req.query;
     const filters = {};
     if (status) filters.status = status;
     if (city) filters.city = city;
-    if (today) filters.today = true;
-    if (yesterday) filters.yesterday = true;
+    if (date) filters.date = date;
     if (search) filters.search = search;
 
     const bookings = await bookingService.getBookings(filters, req.user);
